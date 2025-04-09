@@ -4,7 +4,7 @@ import CustomerList from "./components/CustomerList"; //一覧
 import CustomerForm from "./components/CustomerForm"; //追加・編集
 import CustomerDetail from "./components/CustomerDetail"; //詳細
 import SearchBar from "./components/SearchBar"; //検索バー
-import './App.css';
+// import './App.css';
 
 function App() {
   
