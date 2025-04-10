@@ -26,19 +26,19 @@ const fetchLists = async () => {
   }, []);
    // フィルター実行
    const filter = () => {
-    const filtered = customer.filter((c) =>
-      c.name.toLowerCase().includes(values.toLowerCase())
-    );
-    setValues(filtered);
-  };
+  const filtered = customer.filter((c) =>
+    c.name.toLowerCase().includes(values.toLowerCase())
+  );
+  setFilterCustomer(filtered);  // フィルタリングされたデータをセット
+};
 
   // 顧客追加ページへ移動
   const goToAddCustomers = () => {
     navigate("/add-form");
   };
 // 顧客詳細ページへ移動
-const goToGetCustomers = () => {
-  navigate(`/detail/${customer.id}`);
+const goToGetCustomers = (id) => {
+  navigate(`/detail/${id}`);
 };
 
 
@@ -67,7 +67,7 @@ return(
             <td>{customer.email}</td>
             <td>{customer.phone}</td>
             <td>{customer.company_name}</td>
-            <td><button onClick={goToGetCustomers}>詳細</button></td>
+            <td><button onClick={() => goToGetCustomers(customer.id)}>詳細</button></td>
           </tr>
         ))}
           </tbody>
