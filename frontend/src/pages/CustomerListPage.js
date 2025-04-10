@@ -2,7 +2,7 @@ import api from "../services/api";
 
 export const getLists = async () => {
   try {
-      const response = await api.get("/detail", {
+      const response = await api.get("/customers", {
 
       });
       return response.data;
@@ -11,4 +11,6 @@ export const getLists = async () => {
       throw error;
   }
 };
+
+export default getLists;
 
