@@ -20,7 +20,6 @@ router.get('/',  (req, res) => {
 router.get("/:id", (req, res) => {
   const { id } = req.params;
   const sql = "SELECT * FROM customers WHERE id = ?";
-  console.log("aiu");
   db.query(sql, [id], (err, result) => {
     if (err) {
       console.error(err);
