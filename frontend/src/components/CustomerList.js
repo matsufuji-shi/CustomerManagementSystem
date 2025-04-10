@@ -1,20 +1,29 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-const UserList = ({ categoryList }) => {
-    return (
-        <ul>
-            {categoryList.map((val, index) => (
-                <li key={index}>
-                    <div className="user-info">
-                        <span>名前:</span><span>{val.name}</span>
-                    </div>
-                    <div className="user-info">
-                        <span>Email:</span><span>{val.email}</span>
-                    </div>
-                </li>
-            ))}
-        </ul>
-    );
+const CustomerList = () => {
+    //テーブルの値が入る
+    const [customer, setCustomer] =useState([]);
+
+const fetchTasks = async () => {
+    try {
+      const data = await getLists();  // APIから取得
+      setCustomer(data);  // 取得したタスクを状態にセット
+    } catch (error) {
+      console.error("Failed to fetch tasks", error);
+    }
+  };
+
+  // 初期のタスク取得
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+return(
+    <div>
+
+    </div>
+)
 };
 
-export default UserList;
+export default CustomerList;
