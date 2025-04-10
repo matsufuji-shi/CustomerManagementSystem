@@ -7,7 +7,7 @@ export const getLists = async () => {
       });
       return response.data;
   } catch (error) {
-      console.error("Error fetching tasks:", error);
+      console.error("Error fetching customer:", error);
       throw error;
   }
 };

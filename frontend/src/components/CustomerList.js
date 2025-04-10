@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const CustomerList = () => {
     //テーブルの値が入る
     const [customer, setCustomer] =useState([]);
+    const listHeader =["顧客名", "メールアドレス", "電話番号", "会社名" , "詳細"];
 
 const fetchTasks = async () => {
     try {
@@ -21,6 +22,25 @@ const fetchTasks = async () => {
 
 return(
     <div>
+      <table>
+        <thead>
+          <tr>
+            {listHeader.map((Header,i) => 
+            <th key={i}>{Header}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+        {data.map((row) => (
+          <tr key={customer.id}>
+            <td>{customer.name}</td>
+            <td>{customer.email}</td>
+            <td>{customer.phone}</td>
+            <td>{customer.company_name}</td>
+            <td> <Link to={`/detail/${id}`}><button>編集</button></Link></td>
+          </tr>
+        ))}
+          </tbody>
+      </table>
 
     </div>
 )
