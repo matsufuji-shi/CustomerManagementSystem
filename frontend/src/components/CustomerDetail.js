@@ -65,7 +65,7 @@ function CustomerDetail() {
           <p><strong>電話番号:</strong> {list.phone}</p>
           <p><strong>住所:</strong> {list.address}</p>  
           <p><strong>会社名:</strong> {list.company_name}</p>
-          <Link to={`/detail/${id}`}><button>編集</button></Link>
+          <Link to={`/add-form/${id}`}><button>編集</button></Link>
           <button onClick={handleDelete}>削除</button>
         </>
       ) : (
