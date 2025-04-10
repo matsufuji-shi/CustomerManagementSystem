@@ -23,7 +23,7 @@ function CustomerForm({ onListAdded }) {
     if (isEditing) {
       const fetchTask = async () => {
         try {
-          const { data } = await addList.get(`/tasks/${id}`);
+          const { data } = await addList.get(`/customers/${id}`);
           setFormState({
             name: data.name,
             email: data.email,
@@ -56,18 +56,18 @@ function CustomerForm({ onListAdded }) {
   const handleSave = async (e) => {
     e.preventDefault();
 
-    const { title, description, dueDate, status } = formState;
-    if (!title || !description || !dueDate) {
-      alert("タスクのタイトル、説明、期限日を入力してください");
+    const { name, email, phone, address } = formState;
+    if (!name || !email || !phone || !address) {
+      alert("名前・メールアドレス・電話番号・住所の入力が必要です");
       return;
     }
 
     try {
       if (isEditing) {
-        await axiosInstance.put(`/tasks/${id}`, formState);
+        await addList.put(`/customers/${id}`, formState);
         console.log("タスクが更新されました:", title);
       } else {
-        await addTask(formState);
+        await addList(formState);
         console.log("タスクが追加されました:", title);
 
         setFormState({
@@ -76,7 +76,7 @@ function CustomerForm({ onListAdded }) {
           dueDate: "",
           status: "未完了",
         });
-        if (onTaskAdded) onTaskAdded();
+        if (onListAdded) onListAdded();
       }
       navigate("/");
     } catch (error) {
@@ -87,29 +87,29 @@ function CustomerForm({ onListAdded }) {
   // キャンセル処理
   const handleCancel = () => {
     setFormState(originalFormState);
-    navigate(`/tasks/${id}`);
+    navigate(`/customers/${id}`);
   };
 
   return (
-    <div className={isEditing ? "tasklist" : ""}>
-      <h2>{isEditing ? "タスクを編集" : "タスクを追加"}</h2>
+    <div className={isEditing ? "customerList" : ""}>
+      <h2>顧客追加/編集</h2>
       <form onSubmit={handleSave}>
         <input
           type="text"
-          name="title"
-          placeholder="タスクのタイトル"
-          value={formState.title}
+          name="name"
+          placeholder="顧客名を入力"
+          value={formState.name}
           onChange={handleChange}
-          className="taskInput"
         />
         <br />
-        <textarea
-          name="description"
-          placeholder="タスクの説明"
-          value={formState.description}
+        <input
+          type="email"
+          name="email"
+          placeholder="メールアドレスを入力"
+          value={formState.email}
           onChange={handleChange}
-          className="taskInput"
         />
+        {/* ここから入力 */}
         <br />
         期限日：
         <input
