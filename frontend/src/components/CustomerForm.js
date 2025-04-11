@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {addList} from "../pages/CustomerFormPage";
+import axiosInstance from "../services/api";
 
 function CustomerForm({ onListAdded }) {
   const { id } = useParams();
@@ -18,12 +19,12 @@ function CustomerForm({ onListAdded }) {
 
   const [originalFormState, setOriginalFormState] = useState(formState);
 
-  // 編集モードならデータ取得
+  // 編集モードならデータ取得   OK
   useEffect(() => {
     if (isEditing) {
       const fetchTask = async () => {
         try {
-          const { data } = await addList.get(`/customers/${id}`);
+          const { data } = await axiosInstance.get(`/customers/${id}`);
           setFormState({
             name: data.name,
             email: data.email,
@@ -46,7 +47,7 @@ function CustomerForm({ onListAdded }) {
     }
   }, [id, isEditing]);
 
-  // 共通の変更ハンドラー  次回ここから変更
+  // 共通の変更ハンドラー
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormState((prev) => ({ ...prev, [name]: value }));
@@ -57,6 +58,7 @@ function CustomerForm({ onListAdded }) {
     e.preventDefault();
 
     const { name, email, phone, address } = formState;
+    //if文OK
     if (!name || !email || !phone || !address) {
       alert("名前・メールアドレス・電話番号・住所の入力が必要です");
       return;
@@ -64,11 +66,11 @@ function CustomerForm({ onListAdded }) {
 
     try {
       if (isEditing) {
-        await addList.put(`/customers/${id}`, formState);
-        console.log("タスクが更新されました:", title);
+        await axiosInstance.put(`/customers/${id}`, formState);
+        console.log("タスクが更新されました:", name);
       } else {
         await addList(formState);
-        console.log("タスクが追加されました:", title);
+        console.log("タスクが追加されました:", name);
 
         setFormState({
           title: "",
@@ -84,24 +86,27 @@ function CustomerForm({ onListAdded }) {
     }
   };
 
-  // キャンセル処理
+  // キャンセル処理 OK
   const handleCancel = () => {
     setFormState(originalFormState);
-    navigate(`/customers/${id}`);
+    navigate(`/detail/${id}`);
   };
 
   return (
     <div className={isEditing ? "customerList" : ""}>
       <h2>顧客追加/編集</h2>
       <form onSubmit={handleSave}>
+        {/* maxlengthが波の理由 */}
+        <div>顧客名：</div>
         <input
           type="text"
           name="name"
+          maxlength="255"
           placeholder="顧客名を入力"
           value={formState.name}
           onChange={handleChange}
         />
-        <br />
+         <div>メールアドレス：</div>
         <input
           type="email"
           name="email"
@@ -109,25 +114,34 @@ function CustomerForm({ onListAdded }) {
           value={formState.email}
           onChange={handleChange}
         />
-        {/* ここから入力 */}
-        <br />
-        期限日：
+        <div>電話番号：</div>
         <input
-          type="date"
-          name="dueDate"
-          value={formState.dueDate}
+          type="tel"
+          name="phone"
+          placeholder="電話番号を入力"
+          value={formState.phone}
           onChange={handleChange}
         />
-        <br />
-        ステータス：
-        <select name="status" value={formState.status} onChange={handleChange}>
-          <option value="未完了">未完了</option>
-          <option value="完了">完了</option>
-        </select>
-        <br />
-        <button type="submit" className="taskButton">{isEditing ? "保存" : "追加"}</button>
+        <div>住所：</div>
+        <input
+          type="text"
+          name="address"
+          placeholder="住所を入力"
+          value={formState.address}
+          onChange={handleChange}
+          />
+        <div>会社名：</div>
+        <input
+          type="text"
+          name="company_name"
+          placeholder="会社名を入力"
+          value={formState.company_name}
+          onChange={handleChange}
+          />
+          <br/>
+        <button type="submit">{isEditing ? "保存" : "追加"}</button>
         {isEditing && (
-          <button type="button" onClick={handleCancel} className="taskButton">
+          <button type="button" onClick={handleCancel}>
             キャンセル
           </button>
         )}

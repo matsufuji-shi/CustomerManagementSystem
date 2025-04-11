@@ -11,9 +11,10 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<CustomerList />} />
-      <Route path="/add-form" element={<CustomerForm />} />
-      <Route path="/detail/:id" element={<CustomerDetail />} />
-      <Route path="/search/:id" element={<SearchBar />} />
+      <Route path="/add-form" element={<CustomerForm />} /> {/*追加 */}
+      <Route path="/form/:id" element={<CustomerForm />} /> {/*編集 */}
+      <Route path="/detail/:id" element={<CustomerDetail />} /> {/*詳細 */}
+      <Route path="/search/:id" element={<SearchBar />} /> {/*検索コンポーネント */}
     </Routes>
   )
 }

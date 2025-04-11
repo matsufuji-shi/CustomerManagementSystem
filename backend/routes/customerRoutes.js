@@ -34,17 +34,19 @@ router.get("/:id", (req, res) => {
 
 // 新しいタスクを追加 (POST /customers)
 router.post("/", (req, res) => {
-  const { name, email, phone, address, company_name } = req.body;
+  const { name, email, phone, address, company_name} = req.body;
   
   if (!name || !email || !phone || !address) {
     return res.status(400).send("名前・メールアドレス・電話番号・住所の入力が必要です");
   }
-
+  const created_at = new Date();
+  const updated_at = new Date();  
   const sql = `
-    INSERT INTO customers (name, email, phone, address, company_name)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO customers (name, email, phone, address, company_name, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?,?)
   `;
-  db.query(sql, [name, email, phone, address, company_name], (err, result) => {
+  // console.log(sql);  //sqlには入っているぽい
+  db.query(sql, [name, email, phone, address, company_name, created_at, updated_at], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send("タスクの追加に失敗しました");
@@ -55,20 +57,40 @@ router.post("/", (req, res) => {
 
 // 特定のタスクを更新 (PUT /customers/:id)
 router.put("/:id", (req, res) => {
-  const { name, email, phone, address, company_name } = req.body; 
+  const { name, email, phone, address, company_name } = req.body;
   const { id } = req.params;
 
   if (!name || !email || !phone || !address) {
     return res.status(400).send("名前・メールアドレス・電話番号・住所の入力が必要です");
   }
 
-  const sql = "UPDATE tasks SET name = ?, email = ?, phone = ?, address = ?, company_name = ? WHERE id = ?";
-  db.query(sql, [name, email, phone, address, company_name, id], (err, result) => {
+  // まずは元の created_at を取得
+  const getSql = "SELECT created_at FROM customers WHERE id = ?";
+  db.query(getSql, [id], (err, results) => {
     if (err) {
       console.error(err);
-      return res.status(500).send("タスクの更新に失敗しました");
+      return res.status(500).send("データ取得に失敗しました");
     }
-    res.send("タスクを更新しました");
+
+    if (results.length === 0) {
+      return res.status(404).send("指定されたタスクが見つかりません");
+    }
+
+    const created_at = results[0].created_at;
+    const updated_at = new Date();
+
+    const updateSql = `
+      UPDATE customers
+      SET name = ?, email = ?, phone = ?, address = ?, company_name = ?, created_at = ?, updated_at = ? 
+      WHERE id = ?
+    `;
+    db.query(updateSql, [name, email, phone, address, company_name, created_at, updated_at, id], (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send("タスクの更新に失敗しました");
+      }
+      res.send("タスクを更新しました");
+    });
   });
 });
 
