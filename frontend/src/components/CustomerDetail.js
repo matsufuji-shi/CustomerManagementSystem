@@ -36,7 +36,7 @@ function CustomerDetail() {
   // タスクの削除
   const handleDelete = async () => {
     try {
-      await axiosInstance.delete(`/customer/${id}`);
+      await axiosInstance.delete(`/customers/${id}`);
       console.log("タスクが削除されました");
       navigate("/"); // 削除後、一覧ページに戻る
     } catch (error) {

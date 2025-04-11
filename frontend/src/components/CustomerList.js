@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {getLists} from "../pages/CustomerListPage";
+
 
 function CustomerList()  {
     //テーブルの値が入る
@@ -20,7 +21,7 @@ const fetchLists = async () => {
     }
   };
 
-  // 初期のタスク取得
+  // 初期の顧客リスト取得
   useEffect(() => {
     fetchLists();
   }, []);
@@ -53,6 +54,7 @@ return(
       />
       <button onClick={filter}>フィルタリング</button>
       <button onClick={goToAddCustomers}>顧客情報追加</button>
+      {/* <SearchBar /> */}
       <table>
         <thead>
           <tr>
