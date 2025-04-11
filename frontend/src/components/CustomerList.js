@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {getLists} from "../pages/CustomerListPage";
-
+// import SearchBar from "./SearchBar";
 
 function CustomerList()  {
     //テーブルの値が入る
     const [customer, setCustomer] =useState([]); //通常時
     const [filterCustomer,setFilterCustomer] = useState([]); //フィルタリング
     const [values, setValues] = useState(""); //入力値
+    const [isButtonPressed, setIsButtonPressed] = useState(false); //ボタン
     const navigate = useNavigate();
     const listHeader =["顧客名", "メールアドレス", "電話番号", "会社名" , "詳細"];
 
@@ -25,22 +26,26 @@ const fetchLists = async () => {
   useEffect(() => {
     fetchLists();
   }, []);
-   // フィルター実行
-   const filter = () => {
-  const filtered = customer.filter((c) =>
-    c.name.toLowerCase().includes(values.toLowerCase())
-  );
-  setFilterCustomer(filtered);  // フィルタリングされたデータをセット
-};
 
-  // 顧客追加ページへ移動
-  const goToAddCustomers = () => {
-    navigate("/add-form");
+  // フィルター実行
+  const filter = () => {
+    const filtered = customer.filter((c) =>
+      c.name.toLowerCase().includes(values.toLowerCase())
+    );
+    setFilterCustomer(filtered);  // フィルタリングされたデータをセット
+    setIsButtonPressed(true); //ボタンを正にする
   };
+
+   
 // 顧客詳細ページへ移動
 const goToGetCustomers = (id) => {
   navigate(`/detail/${id}`);
 };
+   // 顧客追加ページへ移動
+   const goToAddCustomers = () => {
+    navigate("/add-form");
+  };
+
 
 
 return(
@@ -54,8 +59,10 @@ return(
       />
       <button onClick={filter}>フィルタリング</button>
       <button onClick={goToAddCustomers}>顧客情報追加</button>
-      {/* <SearchBar /> */}
-      <table>
+
+       {/* <SearchBar /> */}
+       {!isButtonPressed ?(
+        <table>
         <thead>
           <tr>
             {listHeader.map((Header,i) => 
@@ -74,7 +81,30 @@ return(
         ))}
           </tbody>
       </table>
+       ):(
+<table>
+        <thead>
+          <tr>
+            {listHeader.map((Header,i) => 
+            <th key={i}>{Header}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+        {filterCustomer.map((filterCustomer) => (
+          <tr key={filterCustomer.id}>
+            <td>{filterCustomer.name}</td>
+            <td>{filterCustomer.email}</td>
+            <td>{filterCustomer.phone}</td>
+            <td>{filterCustomer.company_name}</td>
+            <td><button onClick={() => goToGetCustomers(filterCustomer.id)}>詳細</button></td>
+          </tr>
+        ))}
+          </tbody>
+      </table>
 
+
+       )}
+      
     </div>
 )
 };
