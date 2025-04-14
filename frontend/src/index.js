@@ -1,9 +1,13 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import { BrowserRouter } from "react-router-dom";
 
-// Appコンポーネントをルート要素にレンダリング
-ReactDOM.render(
-    <App />, // Appコンポーネントを描画
-  document.getElementById('root') // HTMLファイル内のid="root"の要素に描画
+const container = document.getElementById("root");
+const root = ReactDOM.createRoot(container); // ← React18用の書き方
+
+root.render(
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
 );

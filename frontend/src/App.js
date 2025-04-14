@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "r
 import CustomerList from "./components/CustomerList"; //一覧
 import CustomerForm from "./components/CustomerForm"; //追加・編集
 import CustomerDetail from "./components/CustomerDetail"; //詳細
-import SearchBar from "./components/SearchBar"; //検索バー
+// import SearchBar from "./components/SearchBar"; //検索バー
 // import './App.css';
 
 function App() {
@@ -11,9 +11,10 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<CustomerList />} />
-      <Route path="/add-form" element={<CustomerForm />} />
-      <Route path="/detail/:id" element={<CustomerDetail />} />
-      <Route path="/search/:id" element={<SearchBar />} />
+      <Route path="/add-form" element={<CustomerForm />} /> {/*追加 */}
+      <Route path="/form/:id" element={<CustomerForm />} /> {/*編集 */}
+      <Route path="/detail/:id" element={<CustomerDetail />} /> {/*詳細 */}
+      {/* <Route path="/search" element={<SearchBar />} /> 検索コンポーネント */}
     </Routes>
   )
 }
