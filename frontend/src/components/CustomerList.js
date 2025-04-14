@@ -29,15 +29,18 @@ const fetchLists = async () => {
   //追加
   const searchToData = (SearchBarData) => {
     console.log(SearchBarData)
-          const filtered = filterCustomer.filter((c) =>
+    switch(SearchBarData){
+      case "":
+        setFilterCustomer(customer);
+break;
+      default:
+        const filtered = filterCustomer.filter(c =>
             c.name.toLowerCase().includes(SearchBarData.toLowerCase())
           );
           console.log(filtered)
-          setFilterCustomer(filtered);  
-          // フィルタリングされたデータをセット
-
-  };
-  
+          setFilterCustomer(filtered);
+    }
+  }
 
 
     // 顧客詳細ページへ移動
@@ -52,7 +55,7 @@ return(
       <h1>顧客一覧</h1>
         <SearchBar searchToData={searchToData}/>
         
-{/* データが入っていないときにフルにしたいけど今はブタン押してなくても入っている状況にある */}
+
       {searchToData &&(
         <table>
         <thead>
@@ -74,7 +77,7 @@ return(
           </tbody>
       </table>
        )}
-       {!searchToData &&(
+       {!searchToData && (
         <table>
         <thead>
           <tr>
@@ -101,27 +104,3 @@ return(
 };
 
 export default CustomerList;
-
-
-//子から親への伝達参考
-// import { useState } from 'react';
-
-
-// function Parent() {
-//   const [data, setData] = useState('');
-  
-//   const childToParent = (childdata) => {
-//     setData(childdata);
-//   }
-
-//   return (
-//     <div className="App">
-//      {data}
-//       <div>
-//         <Child childToParent={childToParent}/>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default Parent;
