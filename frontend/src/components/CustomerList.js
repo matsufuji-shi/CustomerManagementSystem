@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {getLists} from "../pages/CustomerListPage";
-// import SearchBar from "./SearchBar";
+import SearchBar from "./SearchBar";
 
 function CustomerList()  {
     //テーブルの値が入る
     const [customer, setCustomer] =useState([]); //通常時
-    const [filterCustomer,setFilterCustomer] = useState([]); //フィルタリング
-    const [values, setValues] = useState(""); //入力値
-    const [isButtonPressed, setIsButtonPressed] = useState(false); //ボタン
+  
+    const [filterCustomer,setFilterCustomer] = useState([]); //フィルタリング/検索から持ってきたデータ
     const navigate = useNavigate();
     const listHeader =["顧客名", "メールアドレス", "電話番号", "会社名" , "詳細"];
 
@@ -27,41 +26,55 @@ const fetchLists = async () => {
     fetchLists();
   }, []);
 
-  // フィルター実行
-  const filter = () => {
-    const filtered = customer.filter((c) =>
-      c.name.toLowerCase().includes(values.toLowerCase())
-    );
-    setFilterCustomer(filtered);  // フィルタリングされたデータをセット
-    setIsButtonPressed(true); //ボタンを正にする
-  };
+  //追加
+  const searchToData = (SearchBarData) => {
+    console.log(SearchBarData)
+          const filtered = filterCustomer.filter((c) =>
+            c.name.toLowerCase().includes(SearchBarData.toLowerCase())
+          );
+          console.log(filtered)
+          setFilterCustomer(filtered);  
+          // フィルタリングされたデータをセット
 
-   
-// 顧客詳細ページへ移動
-const goToGetCustomers = (id) => {
-  navigate(`/detail/${id}`);
-};
-   // 顧客追加ページへ移動
-   const goToAddCustomers = () => {
-    navigate("/add-form");
   };
+  
+
+
+    // 顧客詳細ページへ移動
+    const goToGetCustomers = (id) => {
+      navigate(`/detail/${id}`);
+    };
 
 
 
 return(
     <div>
       <h1>顧客一覧</h1>
-      <input
-        type="text"
-        value={values}
-        onChange={(e) => setValues(e.target.value)}
-        placeholder="顧客名で検索"
-      />
-      <button onClick={filter}>フィルタリング</button>
-      <button onClick={goToAddCustomers}>顧客情報追加</button>
-
-       {/* <SearchBar /> */}
-       {!isButtonPressed ?(
+        <SearchBar searchToData={searchToData}/>
+        
+{/* データが入っていないときにフルにしたいけど今はブタン押してなくても入っている状況にある */}
+      {searchToData &&(
+        <table>
+        <thead>
+          <tr>
+            {listHeader.map((Header,i) => 
+            <th key={i}>{Header}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+        {filterCustomer .map((data) => (
+          <tr key={data.id}>
+            <td>{data.name}</td>
+            <td>{data.email}</td>
+            <td>{data.phone}</td>
+            <td>{data.company_name}</td>
+            <td><button onClick={() => goToGetCustomers(data.id)}>詳細</button></td>
+          </tr>
+        ))}
+          </tbody>
+      </table>
+       )}
+       {!searchToData &&(
         <table>
         <thead>
           <tr>
@@ -81,32 +94,34 @@ return(
         ))}
           </tbody>
       </table>
-       ):(
-<table>
-        <thead>
-          <tr>
-            {listHeader.map((Header,i) => 
-            <th key={i}>{Header}</th>)}
-          </tr>
-        </thead>
-        <tbody>
-        {filterCustomer.map((filterCustomer) => (
-          <tr key={filterCustomer.id}>
-            <td>{filterCustomer.name}</td>
-            <td>{filterCustomer.email}</td>
-            <td>{filterCustomer.phone}</td>
-            <td>{filterCustomer.company_name}</td>
-            <td><button onClick={() => goToGetCustomers(filterCustomer.id)}>詳細</button></td>
-          </tr>
-        ))}
-          </tbody>
-      </table>
-
-
        )}
-      
+
     </div>
 )
 };
 
 export default CustomerList;
+
+
+//子から親への伝達参考
+// import { useState } from 'react';
+
+
+// function Parent() {
+//   const [data, setData] = useState('');
+  
+//   const childToParent = (childdata) => {
+//     setData(childdata);
+//   }
+
+//   return (
+//     <div className="App">
+//      {data}
+//       <div>
+//         <Child childToParent={childToParent}/>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default Parent;
