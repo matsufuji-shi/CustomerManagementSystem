@@ -104,6 +104,9 @@ router.delete("/:id", (req, res) => {
       console.error(err);
       return res.status(500).send("タスクの削除に失敗しました");
     }
+    if (result.affectedRows === 0) {
+      return res.status(404).send("タスクが見つかりません");
+    }
     res.send("タスクを削除しました");
   });
 });
