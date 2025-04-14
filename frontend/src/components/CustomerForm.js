@@ -57,17 +57,15 @@ function CustomerForm({ onListAdded }) {
   // 保存処理
   const handleSave = async (e) => {
     e.preventDefault();
-
+  
     const { name, email, phone, address } = formState;
-    //if文OK
     if (!name || !email || !phone || !address) {
       alert("名前・メールアドレス・電話番号・住所の入力が必要です");
       return;
     }
-    
-    setError("");  // エラーをリセット
   
-
+    setError("");  // エラーリセット
+  
     try {
       if (isEditing) {
         await axiosInstance.put(`/customers/${id}`, formState);
@@ -75,7 +73,7 @@ function CustomerForm({ onListAdded }) {
       } else {
         await addList(formState);
         console.log("タスクが追加されました:", name);
-
+  
         setFormState({
           title: "",
           description: "",
@@ -87,6 +85,13 @@ function CustomerForm({ onListAdded }) {
       navigate("/");
     } catch (error) {
       console.error("タスクの処理に失敗しました", error);
+  
+      // サーバーエラー対応
+      if (error.response && error.response.status >= 500) {
+        setError("サーバーエラーが発生しました。時間をおいて再試行するか、サポートまでご連絡ください。");
+      } else {
+        setError("保存中にエラーが発生しました。内容を確認してください。");
+      }
     }
   };
 
@@ -152,6 +157,12 @@ function CustomerForm({ onListAdded }) {
           </button>
         )}
       </form>
+      {/* エラーメッセージの表示 */}
+    {error && (
+      <div style={{ color: "red", marginTop: "1rem" }}>
+        {error}
+      </div>
+    )}
     </div>
   );
 }
