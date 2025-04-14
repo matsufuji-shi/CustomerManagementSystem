@@ -16,7 +16,8 @@ function CustomerForm({ onListAdded }) {
     address: "",
     company_name: "",
   });
-
+  const [error, setError] = useState("");
+  
   const [originalFormState, setOriginalFormState] = useState(formState);
 
   // 編集モードならデータ取得   OK
@@ -63,6 +64,9 @@ function CustomerForm({ onListAdded }) {
       alert("名前・メールアドレス・電話番号・住所の入力が必要です");
       return;
     }
+    
+    setError("");  // エラーをリセット
+  
 
     try {
       if (isEditing) {
@@ -96,12 +100,11 @@ function CustomerForm({ onListAdded }) {
     <div className={isEditing ? "customerList" : ""}>
       <h2>顧客追加/編集</h2>
       <form onSubmit={handleSave}>
-        {/* maxlengthが波の理由 */}
         <div>顧客名：</div>
         <input
           type="text"
           name="name"
-          maxlength="255"
+          pattern=".{1,255}"
           placeholder="顧客名を入力"
           value={formState.name}
           onChange={handleChange}
@@ -110,6 +113,7 @@ function CustomerForm({ onListAdded }) {
         <input
           type="email"
           name="email"
+          pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"
           placeholder="メールアドレスを入力"
           value={formState.email}
           onChange={handleChange}
@@ -118,6 +122,7 @@ function CustomerForm({ onListAdded }) {
         <input
           type="tel"
           name="phone"
+          pattern="\d{2,4}-\d{3,4}-\d{3,4}"
           placeholder="電話番号を入力"
           value={formState.phone}
           onChange={handleChange}
@@ -134,6 +139,7 @@ function CustomerForm({ onListAdded }) {
         <input
           type="text"
           name="company_name"
+          pattern="{1,255}"
           placeholder="会社名を入力"
           value={formState.company_name}
           onChange={handleChange}
