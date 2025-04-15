@@ -89,13 +89,14 @@ function CustomerForm({ onListAdded }) {
     if (!validateForm()) return;  // バリデーション失敗なら保存しない
   
     const { name, email, phone, address } = formState;
+    
     try {
       if (isEditing) {
         await axiosInstance.put(`/customers/${id}`, formState);
-        console.log("タスクが更新されました:", name);
+        console.log("タスクが更新されました:", name, email, phone, address);
       } else {
         await addList(formState);
-        console.log("タスクが追加されました:", name);
+        console.log("タスクが追加されました:", name, email, phone, address);
   
         setFormState({
           name: "",
