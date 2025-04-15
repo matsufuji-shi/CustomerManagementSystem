@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {addList} from "../pages/CustomerFormPage";
+import { addList } from "../pages/CustomerFormPage";
 import axiosInstance from "../services/api";
 
 function CustomerForm({ onListAdded }) {
@@ -16,14 +16,15 @@ function CustomerForm({ onListAdded }) {
     address: "",
     company_name: "",
   });
-  const [error, setError] = useState("");
+
+  const [error, setError] = useState({});
   
   const [originalFormState, setOriginalFormState] = useState(formState);
 
   // 編集モードならデータ取得   OK
   useEffect(() => {
     if (isEditing) {
-      const fetchTask = async () => {
+      const fetchCustomer = async () => {
         try {
           const { data } = await axiosInstance.get(`/customers/${id}`);
           setFormState({
@@ -44,9 +45,36 @@ function CustomerForm({ onListAdded }) {
           console.error("タスクの取得に失敗しました", error);
         }
       };
-      fetchTask();
+      fetchCustomer();
     }
   }, [id, isEditing]);
+
+  // バリデーションチェック
+  const validateForm = () => {
+    const { name, email, phone, address } = formState;
+    const newError = {};
+
+    // 必須項目チェック
+    if (!name) newError.name = "顧客名は必須です";
+    if (!email) newError.email = "メールアドレスは必須です";
+    if (!phone) newError.phone = "電話番号は必須です";
+    if (!address) newError.address = "住所は必須です";
+
+    // メールアドレスの形式チェック
+    const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$/;
+    if (email && !emailPattern.test(email)) {
+      newError.email = "無効なメールアドレスの形式です";
+    }
+
+    // 電話番号の形式チェック
+    const phonePattern = /^\d{2,4}-\d{3,4}-\d{3,4}$/;
+    if (phone && !phonePattern.test(phone)) {
+      newError.phone = "無効な電話番号の形式です";
+    }
+
+    setError(newError);
+    return Object.keys(newError).length === 0;  // エラーがない場合のみ送信可能
+  };
 
   // 共通の変更ハンドラー
   const handleChange = (e) => {
@@ -57,36 +85,38 @@ function CustomerForm({ onListAdded }) {
   // 保存処理
   const handleSave = async (e) => {
     e.preventDefault();
-
-    const { name, email, phone, address } = formState;
-    //if文OK
-    if (!name || !email || !phone || !address) {
-      alert("名前・メールアドレス・電話番号・住所の入力が必要です");
-      return;
-    }
-    
-    setError("");  // エラーをリセット
   
-
+    if (!validateForm()) return;  // バリデーション失敗なら保存しない
+  
+    const { name, email, phone, address } = formState;
+    
     try {
       if (isEditing) {
         await axiosInstance.put(`/customers/${id}`, formState);
-        console.log("タスクが更新されました:", name);
+        console.log("タスクが更新されました:", name, email, phone, address);
       } else {
         await addList(formState);
-        console.log("タスクが追加されました:", name);
-
+        console.log("タスクが追加されました:", name, email, phone, address);
+  
         setFormState({
-          title: "",
-          description: "",
-          dueDate: "",
-          status: "未完了",
+          name: "",
+          email: "",
+          phone: "",
+          address: "",
+          company_name: "",
         });
         if (onListAdded) onListAdded();
       }
       navigate("/");
     } catch (error) {
       console.error("タスクの処理に失敗しました", error);
+  
+      // サーバーエラー対応
+      if (error.response && error.response.status >= 500) {
+        setError({ global: "サーバーエラーが発生しました。時間をおいて再試行するか、サポートまでご連絡ください。" });
+      } else {
+        setError({ global: "保存中にエラーが発生しました。内容を確認してください。" });
+      }
     }
   };
 
@@ -104,29 +134,32 @@ function CustomerForm({ onListAdded }) {
         <input
           type="text"
           name="name"
-          pattern=".{1,255}"
           placeholder="顧客名を入力"
           value={formState.name}
           onChange={handleChange}
         />
-         <div>メールアドレス：</div>
+        {error.name && <div style={{ color: "red" }}>{error.name}</div>}
+
+        <div>メールアドレス：</div>
         <input
           type="email"
           name="email"
-          pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"
           placeholder="メールアドレスを入力"
           value={formState.email}
           onChange={handleChange}
         />
+        {error.email && <div style={{ color: "red" }}>{error.email}</div>}
+
         <div>電話番号：</div>
         <input
           type="tel"
           name="phone"
-          pattern="\d{2,4}-\d{3,4}-\d{3,4}"
           placeholder="電話番号を入力"
           value={formState.phone}
           onChange={handleChange}
         />
+        {error.phone && <div style={{ color: "red" }}>{error.phone}</div>}
+
         <div>住所：</div>
         <input
           type="text"
@@ -134,17 +167,19 @@ function CustomerForm({ onListAdded }) {
           placeholder="住所を入力"
           value={formState.address}
           onChange={handleChange}
-          />
+        />
+        {error.address && <div style={{ color: "red" }}>{error.address}</div>}
+
         <div>会社名：</div>
         <input
           type="text"
           name="company_name"
-          pattern="{1,255}"
           placeholder="会社名を入力"
           value={formState.company_name}
           onChange={handleChange}
-          />
-          <br/>
+        />
+
+        <br/>
         <button type="submit">{isEditing ? "保存" : "追加"}</button>
         {isEditing && (
           <button type="button" onClick={handleCancel}>
@@ -152,6 +187,13 @@ function CustomerForm({ onListAdded }) {
           </button>
         )}
       </form>
+      
+      {/* エラーメッセージの表示 */}
+      {error.global && (
+        <div style={{ color: "red", marginTop: "1rem" }}>
+          {error.global}
+        </div>
+      )}
     </div>
   );
 }
