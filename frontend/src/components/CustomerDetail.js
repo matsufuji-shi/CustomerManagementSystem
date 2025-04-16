@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../services/api";  // axiosインスタンスをインポート
+import '../styles.css';
 
 
 function CustomerDetail() {
@@ -56,17 +57,19 @@ function CustomerDetail() {
 
   // タスクが見つかった場合の表示
   return (
-    <div>
+    <div className="detail">
       <h1>顧客詳細</h1>
       {list ? (
         <>
+        <div className="detailList">
           <h2>{list.name}</h2>
           <p><strong>メールアドレス:</strong>{list.email}</p>
           <p><strong>電話番号:</strong> {list.phone}</p>
           <p><strong>住所:</strong> {list.address}</p>  
           <p><strong>会社名:</strong> {list.company_name}</p>
-          <Link to={`/form/${id}`}><button>編集</button></Link>
-          <button onClick={handleDelete}>削除</button>
+          <Link to={`/form/${id}`}><button className="detailButton">編集</button></Link>
+          <button onClick={handleDelete} className="detailButton">削除</button>
+          </div>
         </>
       ) : (
         <p>タスクが存在しません。</p>
