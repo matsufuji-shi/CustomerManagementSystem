@@ -33,25 +33,39 @@ router.get("/:id", (req, res) => {
 });
 
 // 新しいタスクを追加 (POST /customers)
-router.post("/", (req, res) => {
-  const { name, email, phone, address, company_name} = req.body;
-  
-  if (!name || !email || !phone || !address) {
-    return res.status(400).send("名前・メールアドレス・電話番号・住所の入力が必要です");
+router.post('/', (req, res) => {
+  const { name, email, phone, address, company_name } = req.body;
+
+  if (!name || !email || !phone || !address || !company_name) {
+    return res.status(400).json({ message: '全ての必須項目を入力してください。' });
   }
+
   const created_at = new Date();
-  const updated_at = new Date();  
+  const updated_at = new Date();
+
   const sql = `
     INSERT INTO customers (name, email, phone, address, company_name, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?,?)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
   `;
-  // console.log(sql);  //sqlには入っているぽい
+
   db.query(sql, [name, email, phone, address, company_name, created_at, updated_at], (err, result) => {
     if (err) {
       console.error(err);
-      return res.status(500).send("タスクの追加に失敗しました");
+      return res.status(500).json({ message: '顧客の追加に失敗しました' });
     }
-    res.status(201).send("タスクを追加しました");
+
+    const insertedCustomer = {
+      id: result.insertId,
+      name,
+      email,
+      phone,
+      address,
+      company_name,
+      created_at,
+      updated_at
+    };
+
+    res.status(201).json(insertedCustomer);
   });
 });
 
@@ -60,8 +74,8 @@ router.put("/:id", (req, res) => {
   const { name, email, phone, address, company_name } = req.body;
   const { id } = req.params;
 
-  if (!name || !email || !phone || !address) {
-    return res.status(400).send("名前・メールアドレス・電話番号・住所の入力が必要です");
+  if (!name || !email || !phone || !address || !company_name) {
+    return res.status(400).send("名前・メールアドレス・電話番号・住所・会社名の入力が必要です");
   }
 
   // まずは元の created_at を取得
@@ -73,7 +87,7 @@ router.put("/:id", (req, res) => {
     }
 
     if (results.length === 0) {
-      return res.status(404).send("指定されたタスクが見つかりません");
+      return res.status(404).send("指定された顧客が見つかりません");
     }
 
     const created_at = results[0].created_at;
@@ -81,15 +95,15 @@ router.put("/:id", (req, res) => {
 
     const updateSql = `
       UPDATE customers
-      SET name = ?, email = ?, phone = ?, address = ?, company_name = ?, created_at = ?, updated_at = ? 
+      SET name = ?, email = ?, phone = ?, address = ?, company_name = ?, created_at = ?, updated_at = ?
       WHERE id = ?
     `;
     db.query(updateSql, [name, email, phone, address, company_name, created_at, updated_at, id], (err, result) => {
       if (err) {
         console.error(err);
-        return res.status(500).send("タスクの更新に失敗しました");
+        return res.status(500).send("顧客の更新に失敗しました");
       }
-      res.send("タスクを更新しました");
+      res.status(200).json({ message: "顧客情報を更新しました" });  // レスポンスメッセージを修正
     });
   });
 });
@@ -98,16 +112,16 @@ router.put("/:id", (req, res) => {
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
   const sql = "DELETE FROM customers WHERE id = ?";
-  
+
   db.query(sql, [id], (err, result) => {
     if (err) {
       console.error(err);
-      return res.status(500).send("タスクの削除に失敗しました");
+      return res.status(500).send("顧客の削除に失敗しました");
     }
     if (result.affectedRows === 0) {
-      return res.status(404).send("タスクが見つかりません");
+      return res.status(404).send("顧客が見つかりません");
     }
-    res.send("タスクを削除しました");
+    res.status(200).json({ message: "顧客を削除しました" });  // レスポンスメッセージを修正
   });
 });
 
