@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { addList } from "../pages/CustomerFormPage";
 import axiosInstance from "../services/api";
+import '../styles.css';
 
 function CustomerForm({ onListAdded }) {
   const { id } = useParams();
@@ -127,9 +128,11 @@ function CustomerForm({ onListAdded }) {
   };
 
   return (
-    <div className={isEditing ? "customerList" : ""}>
-      <h2>顧客追加/編集</h2>
-      <form onSubmit={handleSave}>
+    <div>
+      <h2 className="title">顧客追加/編集</h2>
+     
+      <form onSubmit={handleSave} className="formGroup">
+      <div className="form">
         <div>顧客名：</div>
         <input
           type="text"
@@ -180,12 +183,15 @@ function CustomerForm({ onListAdded }) {
         />
 
         <br/>
+        </div>
+        <div className="formButton">
         <button type="submit">{isEditing ? "保存" : "追加"}</button>
         {isEditing && (
           <button type="button" onClick={handleCancel}>
             キャンセル
           </button>
         )}
+       </div>
       </form>
       
       {/* エラーメッセージの表示 */}

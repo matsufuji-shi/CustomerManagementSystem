@@ -25,8 +25,8 @@ db.getConnection((err, connection) => {
 });
 
 
-// app.listen(3001, () => {
-//     console.log('Server running on port 3001');
-// });
+app.listen(3001, () => {
+    console.log('Server running on port 3001');
+});
 
-module.exports = app; 
+// module.exports = app; 

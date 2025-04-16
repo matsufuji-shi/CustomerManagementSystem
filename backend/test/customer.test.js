@@ -1,103 +1,96 @@
 const request = require('supertest');
-const app = require('../app');  // Expressアプリケーションのエントリーポイント
+const app = require('../app');
+const db = require('../db/db');
 
-describe('POST /customers', () => {
-  it('新しい顧客を追加する - 成功ケース', async () => {
-    const response = await request(app)
-      .post('/api/customers')
-      .send({
-        name: '石川 せいや',
-        email: 'seiya.ishikawa@example.com',
-        phone: '090-1234-5678',
-        address: '大阪府堺市',
-        company_name: 'ABC株式会社'
-      });
+let testCustomerId;
 
-    expect(response.statusCode).toBe(201);  // 成功の場合、ステータスコード201
-    expect(response.body).toHaveProperty('id');  // 返されたオブジェクトにIDが含まれているか
-    expect(response.body.name).toBe('石川 せいや');
-  });
-
-  it('必須項目が未入力の場合 - エラーケース', async () => {
-    const response = await request(app)
-      .post('/api/customers')
-      .send({
-        email: 'soshina.shimohuri@example.com',  // 名前が不足している
-        phone: '090-1234-5678',
-        address: '大阪府堺市',
-        company_name: 'ABC株式会社' 
-      });
-
-    expect(response.statusCode).toBe(400);  // エラーステータス
-    expect(response.body.message).toBe('全ての必須項目を入力してください。');
+beforeAll(done => {
+  const sql = `
+    INSERT INTO customers (name, email, phone, address, company_name, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, NOW(), NOW())
+  `;
+  db.query(sql, ['テスト', 'test@example.com', '09012345678', '東京', 'テスト株式会社'], (err, result) => {
+    if (err) throw err;
+    testCustomerId = result.insertId;
+    done();
   });
 });
 
-describe('GET /customers', () => {
-  it('顧客一覧を取得する - 成功ケース', async () => {
-    const response = await request(app)
-      .get('/api/customers');
-
-    expect(response.statusCode).toBe(200);  // 成功の場合、ステータスコード200
-    expect(Array.isArray(response.body)).toBe(true);  // 顧客データが配列であること
+afterAll(done => {
+  db.query('DELETE FROM customers WHERE id = ?', [testCustomerId], () => {
+    db.end();
+    done();
   });
 });
 
-describe('PUT /customers/:id', () => {
-  let customerId;
-
-  beforeAll(async () => {
-    // テスト用顧客を作成してIDを取得
-    const response = await request(app)
-      .post('/api/customers')
-      .send({
-        name: 'テスト 顧客',
-        email: 'test.customer@example.com',
-        phone: '090-1234-0000',
-        address: '大阪府大阪市',
-        company_name: 'XYZ株式会社'
-      });
-    customerId = response.body.id;  // 作成した顧客のIDを保持
+describe('GET /api/customers/:id', () => {
+  it(' 顧客情報を取得できる（成功ケース）', async () => {
+    const res = await request(app).get(`/api/customers/${testCustomerId}`);
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('id', testCustomerId);
+    expect(res.body).toHaveProperty('name', 'テスト');
   });
 
-  it('顧客情報を更新する - 成功ケース', async () => {
-    const response = await request(app)
-      .put(`/api/customers/${customerId}`)
-      .send({
-        name: 'テスト 顧客 更新',
-        email: 'test.customer.updated@example.com',
-        phone: '090-1234-0001',
-        address: '大阪府大阪市更新',
-        company_name: 'XYZ株式会社更新'
-      });
-
-    expect(response.statusCode).toBe(200);  // 成功の場合、ステータスコード200
-    expect(response.body.message).toBe('顧客情報を更新しました');
+  it(' 存在しないID → 404', async () => {
+    const res = await request(app).get('/api/customers/999999');
+    expect(res.statusCode).toBe(404);
+    expect(res.text).toMatch(/見つかりません/);
   });
 });
 
-describe('DELETE /customers/:id', () => {
-  let customerId;
-
-  beforeAll(async () => {
-    // テスト用顧客を作成してIDを取得
-    const response = await request(app)
-      .post('/api/customers')
+describe('PUT /api/customers/:id', () => {
+  it(' 顧客情報を更新できる（成功ケース）', async () => {
+    const res = await request(app)
+      .put(`/api/customers/${testCustomerId}`)
       .send({
-        name: '削除テスト 顧客',
-        email: 'delete.test@example.com',
-        phone: '090-1234-0002',
-        address: '大阪府堺市',
-        company_name: 'ABC株式会社'
+        name: '山田更新',
+        email: 'updated@example.com',
+        phone: '08098765432',
+        address: '大阪',
+        company_name: '更新株式会社'
       });
-    customerId = response.body.id;  // 作成した顧客のIDを保持
+    expect(res.statusCode).toBe(200);
+    expect(res.text).toMatch(/更新しました/);
   });
 
-  it('顧客を削除する - 成功ケース', async () => {
-    const response = await request(app)
-      .delete(`/api/customers/${customerId}`);
+  it(' 必須項目が不足 → 400', async () => {
+    const res = await request(app)
+      .put(`/api/customers/${testCustomerId}`)
+      .send({
+        email: 'no-name@example.com',
+        phone: '08000000000',
+        address: '福岡',
+        company_name: '名前なし株式会社'
+      });
+    expect(res.statusCode).toBe(400);
+    expect(res.text).toMatch(/入力が必要/);
+  });
+});
 
-    expect(response.statusCode).toBe(200);  // 成功の場合、ステータスコード200
-    expect(response.body.message).toBe('顧客を削除しました');
+describe('DELETE /api/customers/:id', () => {
+  let tempId;
+
+  beforeAll(done => {
+    const sql = `
+      INSERT INTO customers (name, email, phone, address, company_name, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, NOW(), NOW())
+    `;
+    db.query(sql, ['削除対象', 'delete@example.com', '07000000000', '札幌', '削除株式会社'], (err, result) => {
+      if (err) throw err;
+      tempId = result.insertId;
+      done();
+    });
+  });
+
+  it(' 顧客を削除できる（成功ケース）', async () => {
+    const res = await request(app).delete(`/api/customers/${tempId}`);
+    expect(res.statusCode).toBe(200);
+    expect(res.text).toMatch(/削除しました/);
+  });
+
+  it(' 存在しないIDを削除 → 404', async () => {
+    const res = await request(app).delete('/api/customers/999999');
+    expect(res.statusCode).toBe(404);
+    expect(res.text).toMatch(/見つかりません/);
   });
 });

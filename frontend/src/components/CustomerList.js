@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {getLists} from "../pages/CustomerListPage";
 import SearchBar from "./SearchBar";
+import '../styles.css';
 
 function CustomerList()  {
     //テーブルの値が入る
@@ -71,7 +72,7 @@ return(
             <td>{data.email}</td>
             <td>{data.phone}</td>
             <td>{data.company_name}</td>
-            <td><button onClick={() => goToGetCustomers(data.id)}>詳細</button></td>
+            <td><button onClick={() => goToGetCustomers(data.id)} className="listButton">詳細</button></td>
           </tr>
         ))}
           </tbody>

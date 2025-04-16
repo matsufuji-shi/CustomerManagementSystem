@@ -1,0 +1,107 @@
+h1{
+  display: flex;
+  justify-content: center;
+}
+
+.searchBer{
+  display: flex;
+  justify-content: center;
+}
+
+.searchBerInput{
+  border-radius: 6px;
+  border: 1px #d9d6d6 solid;
+  padding: 8px;
+  width: 25%;
+}
+
+.searchBarButton{
+  border: 0px black solid;
+  border-radius: 5px;
+  background-color: #4baf4f;
+  color: white;
+  margin: 0 5px;
+  padding: 8px;
+}
+
+.listButton{
+  border: 0px black solid;
+  border-radius: 5px;
+  background-color: #26b8f3;
+  color: white;
+  margin: 0 5px;
+  padding: 8px;
+}
+
+table{
+  width: 100%;
+  border-collapse: collapse; /* セルの線が重ならないように */
+  margin-top: 20px;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px; /* セルの内側に余白を追加 */
+  border: 1px solid #ddd; /* セルの周りに薄い灰色の線を引く */
+}
+
+th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.detail{
+  width: 50%;
+  margin: 0 auto;
+}
+
+.detailList{
+  border: 1px #d9d6d6 solid;
+  padding: 10px;
+}
+
+.detailButton{
+  border: 0px black solid;
+  border-radius: 5px;
+  background-color: #26b8f3;
+  color: white;
+  margin: 0 5px;
+  padding: 8px;
+}
+
+.title{
+  text-align: center;
+}
+
+.formGroup{
+  border: 1px #d9d6d6 solid;
+  padding: 10px;
+  width: 50%;
+  margin: 0 auto;
+}
+
+.form input{
+  width: 95%;
+  padding: 10px 11px;
+  border: 1px #d9d6d6 solid;
+  border-radius: 5px;
+}
+
+
+.form div{
+  font-weight: bold;
+  margin: 5px;
+}
+
+.formButton button{
+  border: 0px black solid;
+  border-radius: 5px;
+  background-color: #26b8f3;
+  color: white;
+  margin: 5px;
+  padding: 8px;
+}
+
+.formButton{
+  text-align: center;
+}
