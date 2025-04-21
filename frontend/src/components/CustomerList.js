@@ -56,8 +56,6 @@ return(
       <h1>顧客一覧</h1>
         <SearchBar searchToData={searchToData}/>
         
-
-      {searchToData &&(
         <table>
         <thead>
           <tr>
@@ -77,28 +75,6 @@ return(
         ))}
           </tbody>
       </table>
-       )}
-       {!searchToData && (
-        <table>
-        <thead>
-          <tr>
-            {listHeader.map((Header,i) => 
-            <th key={i}>{Header}</th>)}
-          </tr>
-        </thead>
-        <tbody>
-        {customer.map((customer) => (
-          <tr key={customer.id}>
-            <td>{customer.name}</td>
-            <td>{customer.email}</td>
-            <td>{customer.phone}</td>
-            <td>{customer.company_name}</td>
-            <td><button onClick={() => goToGetCustomers(customer.id)}>詳細</button></td>
-          </tr>
-        ))}
-          </tbody>
-      </table>
-       )}
 
     </div>
 )
